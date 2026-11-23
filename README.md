@@ -320,3 +320,5 @@ Le regroupement sous un projet multi-modules Maven **ne remet aucunement en caus
   Lombok s'exécute lors de la compilation (`javac`) via son *Annotation Processor*. Il injecte directement les constructeurs, getters, setters et méthodes `toString` sous forme de **byte-code natif dans les fichiers `.class`** (visible dans `target/classes/com/exemple/historique/model/Operation.class`).
 - **Pourquoi Lombok peut être exclu du JAR :**  
   Une fois la compilation terminée, le byte-code contient déjà l'ensemble des méthodes compilées. La bibliothèque Lombok n'a plus aucune utilité lors de l'exécution (*runtime*). Son exclusion via la balise `<excludes>` du plugin Maven allège le `.jar` final sans impacter l'application.
+#   t p 4  
+ 
