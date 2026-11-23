@@ -187,29 +187,6 @@
 
 ### 2. Trajet Complet de la Requête `POST :8888/historique-service/operations`
 *Corps de la requête :* `{"operateur":"somme","a":1,"b":2}`
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Client
-    participant Gateway as Gateway (:8888)
-    participant Eureka as Eureka (:8761)
-    participant Historique as Historique (:8082)
-    participant Calcul as Calcul (:8081)
-
-    Client->>Gateway: POST /historique-service/operations
-    Gateway->>Eureka: Découverte de l'instance HISTORIQUE-SERVICE
-    Eureka-->>Gateway: Instance trouvée (Port 8082)
-    Gateway->>Historique: POST /operations
-    Historique->>Eureka: Découverte de l'instance CALCUL-SERVICE
-    Eureka-->>Historique: Instance trouvée (Port 8081)
-    Historique->>Calcul: GET /calcul/somme?a=1&b=2
-    Note over Calcul: Calcul: 1+2 = 3 (Trace [calcul-service:8081])
-    Calcul-->>Historique: Réponse text "3"
-    Historique-->>Gateway: HTTP 201 Created + JSON + Location
-    Gateway-->>Client: Relais HTTP 201 Created
-```
-
 ```text
 Client                  Passerelle (8888)            Eureka (8761)        Historique (8082)         Calcul (8081)
   |                             |                          |                      |                       |
