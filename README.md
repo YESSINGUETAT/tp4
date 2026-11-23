@@ -24,7 +24,7 @@
 ### Question A.4.2
 **Le client envoie toutes ses requêtes à la passerelle. Citez un avantage et un inconvénient de ce point d'entrée unique.**
 
-> - **Avantage :** **Découplage et simplification client** : le client n'a besoin de connaître qu'une adresse et un port uniques (`http://localhost:8888`). La topologie interne est masquée, et la sécurité/CORS/routage sont centralisés.
+> - **Avantage :** **Découplage et simplification client** : le client n'a besoin de connaître qu'une adresse et un port uniques (`http://localhost:8888`). La topologie interne est masquée, et la sécurité, CORS et le routage sont centralisés.
 > - **Inconvénient :** **Point unique de défaillance (*SPOF*)** : si la passerelle tombe et n'est pas redondée, l'ensemble du système devient inaccessible. Elle introduit aussi un saut réseau supplémentaire (légère latence) et un goulot d'étranglement potentiel sous forte charge.
 
 ---
@@ -68,7 +68,7 @@
 
 ### Tableau D.4 : Tests Directs sur `historique-service` (Port 8082)
 
-| N° | Méthode & URI | Corps de Requête Envoyé | Statut HTTP | En-tête Location / Corps de Réponse Obtenu | Instance de `calcul-service` ayant tracé |
+| N° | Méthode & URI | Corps de Requête Envoyé | Statut HTTP | En-tête Location / Corps de Réponse Obtenu | Instance traitante |
 |:--:|:---|:---|:--:|:---|:--:|
 | **1** | `POST /operations` | `{"operateur":"somme","a":8,"b":2}` | **201 Created** | `Location: http://localhost:8082/operations/1`<br>`{"id":1,"operateur":"somme","a":8,"b":2,"resultat":10.0}` | `[calcul-service:8083]` |
 | **2** | `POST /operations` | `{"operateur":"produit","a":6,"b":7}` | **201 Created** | `Location: http://localhost:8082/operations/2`<br>`{"id":2,"operateur":"produit","a":6,"b":7,"resultat":42.0}` | `[calcul-service:8081]` |
@@ -84,13 +84,13 @@
 **Renvoyez six fois la requête 1 et notez, pour chacune, l'instance qui a affiché la trace. Quelle est la règle de choix ? Comment s'appelle cette stratégie ?**
 
 > - **Traces observées lors des 6 appels consécutifs :**
->   1. Requête 1 $\rightarrow$ `[calcul-service:8083] somme 8+2`
->   2. Requête 2 $\rightarrow$ `[calcul-service:8081] somme 8+2`
->   3. Requête 3 $\rightarrow$ `[calcul-service:8083] somme 8+2`
->   4. Requête 4 $\rightarrow$ `[calcul-service:8081] somme 8+2`
->   5. Requête 5 $\rightarrow$ `[calcul-service:8083] somme 8+2`
->   6. Requête 6 $\rightarrow$ `[calcul-service:8081] somme 8+2`
-> - **Règle de choix :** Les requêtes sont transmises successivement d'une instance à l'autre en boucle circulaire fermée.
+>   1. Requête 1 → `[calcul-service:8083] somme 8+2`
+>   2. Requête 2 → `[calcul-service:8081] somme 8+2`
+>   3. Requête 3 → `[calcul-service:8083] somme 8+2`
+>   4. Requête 4 → `[calcul-service:8081] somme 8+2`
+>   5. Requête 5 → `[calcul-service:8083] somme 8+2`
+>   6. Requête 6 → `[calcul-service:8081] somme 8+2`
+> - **Règle de choix :** Les requêtes sont transmises successivement d'une instance à l'autre en alternance stricte.
 > - **Nom de la stratégie :** La stratégie de répartition de charge par **tour de rôle (*Round-Robin*)**.
 
 ---
@@ -188,7 +188,29 @@
 ### 2. Trajet Complet de la Requête `POST :8888/historique-service/operations`
 *Corps de la requête :* `{"operateur":"somme","a":1,"b":2}`
 
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client
+    participant Gateway as Gateway (:8888)
+    participant Eureka as Eureka (:8761)
+    participant Historique as Historique (:8082)
+    participant Calcul as Calcul (:8081)
+
+    Client->>Gateway: POST /historique-service/operations
+    Gateway->>Eureka: Découverte de l'instance HISTORIQUE-SERVICE
+    Eureka-->>Gateway: Instance trouvée (Port 8082)
+    Gateway->>Historique: POST /operations
+    Historique->>Eureka: Découverte de l'instance CALCUL-SERVICE
+    Eureka-->>Historique: Instance trouvée (Port 8081)
+    Historique->>Calcul: GET /calcul/somme?a=1&b=2
+    Note over Calcul: Calcul: 1+2 = 3 (Trace [calcul-service:8081])
+    Calcul-->>Historique: Réponse text "3"
+    Historique-->>Gateway: HTTP 201 Created + JSON + Location
+    Gateway-->>Client: Relais HTTP 201 Created
 ```
+
+```text
 Client                  Passerelle (8888)            Eureka (8761)        Historique (8082)         Calcul (8081)
   |                             |                          |                      |                       |
   | 1. POST /historique-service |                          |                      |                       |
@@ -320,5 +342,3 @@ Le regroupement sous un projet multi-modules Maven **ne remet aucunement en caus
   Lombok s'exécute lors de la compilation (`javac`) via son *Annotation Processor*. Il injecte directement les constructeurs, getters, setters et méthodes `toString` sous forme de **byte-code natif dans les fichiers `.class`** (visible dans `target/classes/com/exemple/historique/model/Operation.class`).
 - **Pourquoi Lombok peut être exclu du JAR :**  
   Une fois la compilation terminée, le byte-code contient déjà l'ensemble des méthodes compilées. La bibliothèque Lombok n'a plus aucune utilité lors de l'exécution (*runtime*). Son exclusion via la balise `<excludes>` du plugin Maven allège le `.jar` final sans impacter l'application.
-#   t p 4  
- 
