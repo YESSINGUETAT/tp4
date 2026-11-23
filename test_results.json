@@ -1,0 +1,190 @@
+{
+  "D.4": [
+    {
+      "num": 1,
+      "method": "POST",
+      "url": "http://localhost:8082/operations",
+      "data": {
+        "operateur": "somme",
+        "a": 8,
+        "b": 2
+      },
+      "status": 201,
+      "body": "{\"id\":1,\"operateur\":\"somme\",\"a\":8,\"b\":2,\"resultat\":10.0}",
+      "location": "http://localhost:8082/operations/1",
+      "trace_instance": "calcul-service:8083"
+    },
+    {
+      "num": 2,
+      "method": "POST",
+      "url": "http://localhost:8082/operations",
+      "data": {
+        "operateur": "produit",
+        "a": 6,
+        "b": 7
+      },
+      "status": 201,
+      "body": "{\"id\":2,\"operateur\":\"produit\",\"a\":6,\"b\":7,\"resultat\":42.0}",
+      "location": "http://localhost:8082/operations/2",
+      "trace_instance": "calcul-service:8081"
+    },
+    {
+      "num": 3,
+      "method": "POST",
+      "url": "http://localhost:8082/operations",
+      "data": {
+        "operateur": "division",
+        "a": 7,
+        "b": 2
+      },
+      "status": 201,
+      "body": "{\"id\":3,\"operateur\":\"division\",\"a\":7,\"b\":2,\"resultat\":3.5}",
+      "location": "http://localhost:8082/operations/3",
+      "trace_instance": "calcul-service:8083"
+    },
+    {
+      "num": 4,
+      "method": "POST",
+      "url": "http://localhost:8082/operations",
+      "data": {
+        "operateur": "division",
+        "a": 7,
+        "b": 0
+      },
+      "status": 400,
+      "body": "{\"erreur\":\"Erreur : division par 0 impossible\"}",
+      "location": null,
+      "trace_instance": "calcul-service:8081"
+    },
+    {
+      "num": 5,
+      "method": "POST",
+      "url": "http://localhost:8082/operations",
+      "data": {
+        "operateur": "racine",
+        "a": 9,
+        "b": 0
+      },
+      "status": 400,
+      "body": "{\"erreur\":\"Operateur inconnu : racine\"}",
+      "location": null,
+      "trace_instance": "none"
+    },
+    {
+      "num": 6,
+      "method": "GET",
+      "url": "http://localhost:8082/operations",
+      "data": null,
+      "status": 200,
+      "body": "[{\"id\":1,\"operateur\":\"somme\",\"a\":8,\"b\":2,\"resultat\":10.0},{\"id\":2,\"operateur\":\"produit\",\"a\":6,\"b\":7,\"resultat\":42.0},{\"id\":3,\"operateur\":\"division\",\"a\":7,\"b\":2,\"resultat\":3.5}]",
+      "location": null,
+      "trace_instance": "none"
+    },
+    {
+      "num": 7,
+      "method": "GET",
+      "url": "http://localhost:8082/operations/2",
+      "data": null,
+      "status": 200,
+      "body": "{\"id\":2,\"operateur\":\"produit\",\"a\":6,\"b\":7,\"resultat\":42.0}",
+      "location": null,
+      "trace_instance": "none"
+    }
+  ],
+  "D.1": [
+    {
+      "call": 1,
+      "status": 201,
+      "instance": "8083"
+    },
+    {
+      "call": 2,
+      "status": 201,
+      "instance": "8081"
+    },
+    {
+      "call": 3,
+      "status": 201,
+      "instance": "8083"
+    },
+    {
+      "call": 4,
+      "status": 201,
+      "instance": "8081"
+    },
+    {
+      "call": 5,
+      "status": 201,
+      "instance": "8083"
+    },
+    {
+      "call": 6,
+      "status": 201,
+      "instance": "8081"
+    }
+  ],
+  "E.5": [
+    {
+      "num": 1,
+      "method": "GET",
+      "url": "http://localhost:8888/calcul-service/calcul/somme?a=2&b=3",
+      "data": null,
+      "status": 200,
+      "body": "5",
+      "responder": "calcul-service:8081"
+    },
+    {
+      "num": 2,
+      "method": "GET",
+      "url": "http://localhost:8888/calcul-service/calcul/produit/6/7",
+      "data": null,
+      "status": 200,
+      "body": "42",
+      "responder": "calcul-service:8083"
+    },
+    {
+      "num": 3,
+      "method": "GET",
+      "url": "http://localhost:8888/historique-service/operations",
+      "data": null,
+      "status": 200,
+      "body": "[{\"id\":1,\"operateur\":\"somme\",\"a\":8,\"b\":2,\"resultat\":10.0},{\"id\":2,\"operateur\":\"produit\",\"a\":6,\"b\":7,\"resultat\":42.0},{\"id\":3,\"operateur\":\"division\",\"a\":7,\"b\":2,\"resultat\":3.5},{\"id\":4,\"operateur\":\"somme\",\"a\":8,\"b\":2,\"resultat\":10.0},{\"id\":5,\"operateur\":\"somme\",\"a\":8,\"b\":2,\"resultat\":10.0},{\"id\":6,\"operateur\":\"somme\",\"a\":8,\"b\":2,\"resultat\":10.0},{\"id\":7,\"operateur\":\"somme\",\"a\":8,\"b\":2,\"resultat\":10.0},{\"id\":8,\"operateur\":\"somme\",\"a\":8,\"b\":2,\"resultat\":10.0},{\"id\":9,\"operateur\":\"somme\",\"a\":8,\"b\":2,\"resultat\":10.0}]",
+      "responder": "historique-service"
+    },
+    {
+      "num": 4,
+      "method": "POST",
+      "url": "http://localhost:8888/historique-service/operations",
+      "data": {
+        "operateur": "somme",
+        "a": 1,
+        "b": 1
+      },
+      "status": 201,
+      "body": "{\"id\":10,\"operateur\":\"somme\",\"a\":1,\"b\":1,\"resultat\":2.0}",
+      "responder": "calcul-service:8081"
+    },
+    {
+      "num": 5,
+      "method": "GET",
+      "url": "http://localhost:8888/calcul/somme?a=2&b=3",
+      "data": null,
+      "status": 404,
+      "body": "{\"timestamp\":\"2026-11-23T20:23:59.528Z\",\"path\":\"/calcul/somme\",\"status\":404,\"error\":\"Not Found\",\"requestId\":\"190f4719-7\"}",
+      "responder": "gateway"
+    },
+    {
+      "num": 6,
+      "method": "GET",
+      "url": "http://localhost:8888/gateway-service/actuator/gateway/routes",
+      "data": null,
+      "status": 404,
+      "body": "{\"timestamp\":\"2026-11-23T20:23:59.855Z\",\"path\":\"/gateway-service/actuator/gateway/routes\",\"status\":404,\"error\":\"Not Found\",\"requestId\":\"4ef82251-8\"}",
+      "responder": "gateway"
+    }
+  ],
+  "actuator_direct": {
+    "status": 200,
+    "body": "[{\"predicate\":\"(RouteDefinitionRouteLocator$$Lambda/0x00000000988068e8 && Paths: [/calcul-service/**], match trailing slash: true)\",\"metadata\":{\"management.port\":\"8083\"},\"route_id\":\"ReactiveCompositeDiscoveryClient_CALCUL-SERVICE\",\"filters\":[\"[[RewritePath /calcul-service/?(?<remaining>.*) = '/${remaining}'], order = 1]\"],\"uri\":\"lb://CALCUL-SERVICE\",\"order\":0},{\"predicate\":\"(RouteDefinitionRouteLocator$$Lambda/0x00000000988068e8 && Paths: [/historique-service/**], match trailing slash: true)\",\"metadata\":{\"management.port\":\"8082\"},\"route_id\":\"ReactiveCompositeDiscoveryClient_HISTORIQUE-SERVICE\",\"filters\":[\"[[RewritePath /historique-service/?(?<remaining>.*) = '/${remaining}'], order = 1]\"],\"uri\":\"lb://HISTORIQUE-SERVICE\",\"order\":0}]"
+  }
+}
